@@ -15,9 +15,15 @@ pipeline {
             }
         }
 
+        stage('Docker Build') {
+            steps {
+                bat 'docker build -t weather-app .'
+            }
+        }
+
         stage('Success') {
             steps {
-                echo 'Weather App Build Successful!'
+                echo 'Weather App Docker Image Created Successfully!'
             }
         }
     }
