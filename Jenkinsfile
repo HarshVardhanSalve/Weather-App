@@ -21,6 +21,20 @@ pipeline {
             }
         }
 
+        stage('Debug Credentials') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    bat '''
+                    echo Docker User: %DOCKER_USER%
+                    '''
+                }
+            }
+        }
+
         stage('Docker Push') {
             steps {
                 withCredentials([usernamePassword(
@@ -30,9 +44,10 @@ pipeline {
                 )]) {
 
                     bat '''
-                    echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                    docker login -u %DOCKER_USER% -p %DOCKER_PASS%
                     docker tag weather-app:v2 %DOCKER_USER%/weather-app:latest
                     docker push %DOCKER_USER%/weather-app:latest
+                    docker logout
                     '''
                 }
             }
