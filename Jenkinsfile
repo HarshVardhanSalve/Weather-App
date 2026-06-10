@@ -17,7 +17,7 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                bat 'docker build -t weather-app .'
+                bat 'docker build -t weather-app:v2 .'
             }
         }
 
