@@ -21,20 +21,6 @@ pipeline {
             }
         }
 
-        stage('Debug Credentials') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    bat '''
-                    echo Docker User: %DOCKER_USER%
-                    '''
-                }
-            }
-        }
-
         stage('Docker Push') {
             steps {
                 withCredentials([usernamePassword(
@@ -45,8 +31,14 @@ pipeline {
 
                     bat '''
                     docker login -u %DOCKER_USER% -p %DOCKER_PASS%
+                    if errorlevel 1 exit /b 1
+
                     docker tag weather-app:v2 %DOCKER_USER%/weather-app:latest
+                    if errorlevel 1 exit /b 1
+
                     docker push %DOCKER_USER%/weather-app:latest
+                    if errorlevel 1 exit /b 1
+
                     docker logout
                     '''
                 }
@@ -57,6 +49,15 @@ pipeline {
             steps {
                 echo 'Weather App Docker Image Built and Pushed Successfully!'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed. Check Docker login/token permissions.'
         }
     }
 }
