@@ -9,6 +9,12 @@ pipeline {
             }
         }
 
+        stage('Security Scan') {
+            steps {
+                bat 'npm audit --audit-level=high'
+            }
+        }
+
         stage('Build Project') {
             steps {
                 bat 'npm run build'
@@ -57,7 +63,7 @@ pipeline {
             echo 'Pipeline completed successfully.'
         }
         failure {
-            echo 'Pipeline failed. Check Docker login/token permissions.'
+            echo 'Pipeline failed. Check Jenkins logs.'
         }
     }
 }
